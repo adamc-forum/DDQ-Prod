@@ -15,7 +15,6 @@ colorama==0.4.6
 cryptography==41.0.7
 distro==1.8.0
 dnspython==2.4.2
-fastapi==0.104.1
 h11==0.14.0
 httpcore==1.0.2
 httptools==0.6.1
@@ -46,6 +45,8 @@ tenacity==8.2.3
 tqdm==4.66.1
 typing_extensions==4.8.0
 urllib3==2.1.0
-uvicorn==0.24.0.post1
 watchfiles==0.21.0
 websockets==12.0
+fastapi
+uvicorn
+gunicorn
