@@ -18,9 +18,9 @@ class DocumentParser:
 
     def __init__(self, result, start_page=1, end_page=None):
 
-        # if not isinstance(result, AnalyzeResult):
-        #     raise ValueError(
-        #         f"Document Parser input must be of type AnalyzeResult. Got type {type(result)}.")
+        if not isinstance(result, AnalyzeResult):
+            raise ValueError(
+                f"Document Parser input must be of type AnalyzeResult. Got type {type(result)}.")
 
         if result.pages is None or len(result.pages) == 0:
             raise ValueError(

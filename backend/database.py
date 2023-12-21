@@ -12,9 +12,9 @@ class DatabaseClient:
   def setup_collection(self):
     if self.collection_name not in self.db.list_collection_names():
         self.db.create_collection(self.collection_name)
-        print(f"Created collection '{self.collection_name}'.\n")
+        print(f"Created collection '{self.collection_name}'.")
     else:
-        print(f"Using collection: '{self.collection_name}'.\n")
+        print(f"Using collection: '{self.collection_name}'.")
 
   def create_indices(self):
     vector_index_name = 'VectorSearchIndex'
@@ -60,5 +60,10 @@ class DatabaseClient:
         print(f"ERROR: Attempting to add duplicate id {document['id']}")
         continue
   
-  def remove_data_from_collection(self, substring: str):
-    self.collection.delete_many({"yourFieldName": {"$regex": substring}})
+  def remove_data_from_collection(self, fieldname: str = None, substring: str = None, delete_all: bool = False):
+    if delete_all:
+        self.collection.delete_many({})
+    else:
+        if fieldname is None or substring is None:
+            raise ValueError("fieldname and substring must be provided unless delete_all is True")
+        self.collection.delete_many({fieldname: {"$regex": substring}})

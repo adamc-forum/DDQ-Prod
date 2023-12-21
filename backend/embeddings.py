@@ -1,5 +1,6 @@
 import json
-
+import copy
+from datetime import datetime
 from classes import (
     DocumentChunk
 )
@@ -23,20 +24,25 @@ def convert_chunks_to_json(chunks: list[DocumentChunk], client, embedding_model)
     for chunk in chunks:
         item = {}
         n += 1
-        title_embeddings = generate_embeddings(chunk.filename, client, embedding_model) if title_embeddings is None else title_embeddings 
         content_embeddings = generate_embeddings(chunk.content, client, embedding_model)
         item['id'] = chunk.id,
+        item['clientName'] = chunk.client_name,
+        item['documentName'] = chunk.document_name,
         item['date'] = chunk.date,
-        item['filename'] = chunk.filename,
         item['page'] = chunk.page_number,
         item['content'] = chunk.content,
-        item['titleVector'] = title_embeddings
         item['contentVector'] = content_embeddings
         item['@search.action'] = 'upload'
-        print("Creating embeddings for item:", n, "/" ,len(chunks), end='\r')
+        print("Creating embeddings for item:", n, "/", len(chunks), end='\r')
         items.append(item)
 
+    items_json = copy.deepcopy(items)
+
+    # Convert the 'date' field in the copied list from datetime to string
+    for item in items_json:
+        item['date'] = item['date'][0].strftime('%Y-%m-%d %H:%M:%S')
+    
     with open("document_parsing_vectorized_backup.json", "w") as f:
-        json.dump(items, f)
+        json.dump(items_json, f)
     
     return items
