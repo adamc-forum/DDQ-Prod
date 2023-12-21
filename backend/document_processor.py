@@ -63,15 +63,14 @@ class DocumentProcessor:
         current_chunk.add_document_object(content)
         return current_chunk
 
-    def prepend_headers_to_chunk(self, current_chunk: DocumentChunk, current_heading: str, current_subheading: str) -> DocumentChunk:
+    def prepend_headers_to_chunk(self, current_chunk: DocumentChunk, current_heading: str = "", current_subheading: str = "") -> DocumentChunk:
         heading = f"Section {current_heading}: " if current_heading else ""
         subheading = f"Section {current_subheading}: " if current_subheading else ""
         current_chunk.content = heading + subheading + current_chunk.content
         return current_chunk
 
-    def finalize_chunk(self, chunk, document_flow, min_words_threshold=8):
-        # Splitting on colon to get only text after chunk headers
-        if chunk.content and len(chunk.content.split(':')[-1].split()) >= min_words_threshold:  # Add the chunk if it contains any content
+    def finalize_chunk(self, chunk, document_flow, min_words_threshold=12):
+        if len(chunk.content.split()) >= min_words_threshold:  # Add the chunk if it contains any content
             document_flow.add_chunk(chunk)
 
     def get_bold_spans(self):

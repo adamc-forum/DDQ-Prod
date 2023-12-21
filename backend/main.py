@@ -3,7 +3,8 @@ import json
 from datetime import datetime
 
 from document_processor_subclasses import (
-    MasterDDQProcessor
+    MasterDDQProcessor, 
+    ClientResponsesProcessor
 )
 
 from constants import (
@@ -66,16 +67,18 @@ db_client.create_indices()
 
 # print(document_analysis_result)
 
-with open('MasterDDQ.pkl', 'rb') as file:
+with open('layout_backup.pkl', 'rb') as file:
     result = pickle.load(file)
 
-document_parser = DocumentParser(result=result, start_page=3)
+document_parser = DocumentParser(result=result, start_page=1)
 
 filename = TARGET_PDF_PATH.split('/')[-1].split(".pdf")[0]
 
-master_ddq_processor = MasterDDQProcessor(document_parser=document_parser, filename=filename)
+client_response_processor = ClientResponsesProcessor(document_parser=document_parser, subheader_color="#010101", filename=filename)
 
-document_flow: DocumentFlow = master_ddq_processor.process_document()
+# # master_ddq_processor = MasterDDQProcessor(document_parser=document_parser, filename=filename)
+
+document_flow: DocumentFlow = client_response_processor.process_document()
 
 with open("document_parsing_backup.json", "w") as file:
     file.write(json.dumps(document_flow.to_dict()))

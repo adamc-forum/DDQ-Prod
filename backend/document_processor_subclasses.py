@@ -2,7 +2,8 @@ from document_processor import DocumentProcessor
 from document_parser_utils import add_chunk_and_initialize_new
 from classes import (
     DocumentFlow, 
-    DocumentChunk
+    DocumentChunk, 
+    CleanedParagraph
 )
 
 class MasterDDQProcessor(DocumentProcessor):
@@ -76,7 +77,7 @@ class MasterDDQProcessor(DocumentProcessor):
             # Start a new chunk if required
             if start_new_chunk:
                 if current_chunk.content:  # Check if there's content to be finalized
-                    current_chunk = self.prepend_headers_to_chunk(current_chunk, current_heading, current_subheading)
+                    current_chunk = self.prepend_headers_to_chunk(current_chunk, current_heading=current_heading, current_subheading=current_subheading)
                     self.finalize_chunk(current_chunk, document_flow)
                 current_chunk = DocumentChunk()
             
@@ -92,7 +93,7 @@ class MasterDDQProcessor(DocumentProcessor):
 
         return document_flow
 
-    def get_subheadings(self) -> list:
+    def get_subheadings(self) -> list[CleanedParagraph]:
         subheader_spans = self.get_color_spans(self.subheader_color)
         table_spans = [table.span for table in self.cleaned_tables]
         subheadings = self.document_parser.get_matching_paragraphs(
@@ -109,6 +110,8 @@ class ClientResponsesProcessor(DocumentProcessor):
         super().__init__(document_parser, filename)
         self.subheader_color = subheader_color
         self.subheadings = self.get_subheadings()
+        # for subheading in self.subheadings:
+        #     print(subheading.content)
     
     def get_subheadings(self) -> list:
         subheader_spans = self.get_color_spans(self.subheader_color)
@@ -123,6 +126,54 @@ class ClientResponsesProcessor(DocumentProcessor):
         return subheadings
 
     def process_document(self):
-        pass
-    
-    
+        document_flow = DocumentFlow(self.filename)
+        current_chunk = DocumentChunk()
+        max_chunk_size = 750  # Adjust the chunk size as needed
+        found_subheader = False
+        last_found_was_header = False
+        current_subheading = ""
+        
+        for paragraph in self.cleaned_paragraphs:
+            if "Forum House at Brookfield Place East Podium, 2nd Floor 181 Bay Street Toronto, ON M5J 2T3" in paragraph.content:
+                continue
+            if paragraph.role == 'pageFooter' or paragraph.role == 'pageNumber':
+                continue
+            
+            is_subheader = paragraph in self.subheadings
+            
+            is_in_table, table = self.is_paragraph_in_table(paragraph.span)
+            if is_in_table:
+                if table in self.processed_tables:
+                    continue
+                current_chunk.add_document_object(table)
+                self.processed_tables.add(table)
+            
+            # Determine if a new chunk should start
+            start_new_chunk = False
+            if is_subheader:
+                if not last_found_was_header and found_subheader:
+                    start_new_chunk = True
+                found_subheader = True
+            elif not found_subheader and len(current_chunk.content) >= max_chunk_size:
+                # print("Exceeded max chunk size")
+                start_new_chunk = True
+                
+            # print(f"{start_new_chunk} - {paragraph.content} - {is_subheader}")
+            
+            # Start a new chunk if required
+            if start_new_chunk:
+                if current_chunk.content:  # Check if there's content to be finalized
+                    self.finalize_chunk(current_chunk, document_flow)
+                current_chunk = DocumentChunk()
+            
+            # Directly add paragraph to the chunk
+            if not is_in_table:
+                current_chunk.add_document_object(paragraph)
+            
+            last_found_was_header = is_subheader
+            
+        # Finalize the last chunk
+        if current_chunk.content:
+            self.finalize_chunk(current_chunk, document_flow)
+
+        return document_flow

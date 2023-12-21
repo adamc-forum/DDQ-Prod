@@ -5,7 +5,7 @@ dotenv.load_dotenv()
 
 # ------------------------- General Constants --------------------
 
-TARGET_PDF_PATH = "../data/raw/Forum Internal_Master DDQ_30-06-2023.pdf"
+TARGET_PDF_PATH = "../data/raw/Capstone_Responses_24-02-2022.pdf"
 
 # ------------------------- DB Constants --------------------
 

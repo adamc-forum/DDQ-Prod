@@ -114,13 +114,16 @@ class DocumentParser:
                 
             if parsed_successfully:
                 all_rows = f"For \"{table_header}\": {'.'.join(all_rows)}"
-                cleaned_tables.append(
-                    CleanedTable(
-                        content=all_rows,
-                        page=table.bounding_regions[0].page_number,
-                        span=(table.spans[0].offset, table.spans[0].length)
-                    )
+            else:
+                all_rows = f"For \"{table_header}\": {'.'.join([cell.content for cell in table.cells])}"
+                
+            cleaned_tables.append(
+                CleanedTable(
+                    content=all_rows,
+                    page=table.bounding_regions[0].page_number,
+                    span=(table.spans[0].offset, table.spans[0].length)
                 )
+            )
         return cleaned_tables
 
     def extract_cleaned_font_weights(self, font_weights: dict[str, list[DocumentStyle]] = None) -> list[CleanedFontWeight]:
@@ -178,7 +181,7 @@ class DocumentParser:
         paragraphs: list[CleanedParagraph] = None,
         regex_pattern: str = None,
         avoid_spans: list(tuple[int, int]) = None  
-    ):
+    ) -> list[CleanedParagraph]:
         matching_paragraphs = []
         for paragraph in paragraphs:
             paragraph_start = paragraph.span[0]
