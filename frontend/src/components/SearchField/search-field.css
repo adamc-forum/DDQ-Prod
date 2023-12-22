@@ -1,0 +1,16 @@
+.search-form__input {
+    width: 100%; /* Full width */
+    height: 40px; /* Increased height */
+    padding: 0 15px; /* Padding on the sides */
+    border: 2px solid #cccccc; /* Subtle border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+    font-size: 16px; /* Font size */
+    color: #333; /* Text color */
+    outline: none; /* Removes the default focus outline */
+}
+
+.search-form__input:focus {
+    border-color: var(--burgundy); /* Changes border color on focus */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Slightly stronger box shadow on focus */
+}

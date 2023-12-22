@@ -1,0 +1,20 @@
+.search-result__result-item {
+    border: 1px solid #ccc; /* Light border for each item */
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px; /* Slightly rounded corners */
+    background-color: #f9f9f9; /* Light background */
+}
+
+.search-result__result-item div {
+    margin-bottom: 10px; /* Spacing between div elements */
+}
+
+.search-result__result-item div:nth-child(2) {
+    color: #2a9d8f; /* Shade of green for meta tags */
+    font-weight: bold; /* Make meta text bold */
+}
+
+.search-result__result-item div:last-child {
+    font-style: italic; /* Italicize the content for distinction */
+}

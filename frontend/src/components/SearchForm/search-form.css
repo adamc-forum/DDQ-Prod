@@ -1,0 +1,6 @@
+.search-form__input-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 10rem;
+}
