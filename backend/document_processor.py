@@ -65,7 +65,7 @@ class DocumentProcessor:
 
     def prepend_headers_to_chunk(self, current_chunk: DocumentChunk, current_heading: str = "", current_subheading: str = "") -> DocumentChunk:
         heading = f"Section {current_heading}: " if current_heading else ""
-        subheading = f"Section {current_subheading}: " if current_subheading else ""
+        subheading = f"Subsection {current_subheading}: " if current_subheading else ""
         current_chunk.content = heading + subheading + current_chunk.content
         return current_chunk
 

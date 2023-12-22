@@ -39,7 +39,6 @@ class MasterDDQProcessor(DocumentProcessor):
         found_header_or_subheader = False
         found_subheader = False
         current_heading = ""
-        current_subheading = ""
         
         for paragraph in self.cleaned_paragraphs:
             if paragraph.role == 'pageFooter' or paragraph.role == 'pageNumber':
@@ -47,13 +46,6 @@ class MasterDDQProcessor(DocumentProcessor):
             
             is_header = paragraph.content in self.section_headers
             is_subheader = paragraph in self.subheadings
-            
-            # Update heading or subheading
-            if is_header:
-                current_heading = paragraph.content
-                current_subheading = ""  # Reset subheading when a new header is encountered
-            elif is_subheader:
-                current_subheading = paragraph.content
             
             is_in_table, table = self.is_paragraph_in_table(paragraph.span)
             if is_in_table:
@@ -77,18 +69,23 @@ class MasterDDQProcessor(DocumentProcessor):
             # Start a new chunk if required
             if start_new_chunk:
                 if current_chunk.content:  # Check if there's content to be finalized
-                    current_chunk = self.prepend_headers_to_chunk(current_chunk, current_heading=current_heading, current_subheading=current_subheading)
+                    current_chunk = self.prepend_headers_to_chunk(current_chunk, current_heading=current_heading)
                     self.finalize_chunk(current_chunk, document_flow)
                 current_chunk = DocumentChunk()
             
             # Directly add paragraph to the chunk
-            current_chunk.add_document_object(paragraph)
+            if not is_header:
+                current_chunk.add_document_object(paragraph)
+            
+            # Update heading or subheading
+            if is_header:
+                current_heading = paragraph.content
             
             last_found_was_header = is_header or is_subheader
 
         # Finalize the last chunk
         if current_chunk.content:
-            self.prepend_headers_to_chunk(current_chunk, current_heading, current_subheading)
+            self.prepend_headers_to_chunk(current_chunk, current_heading)
             self.finalize_chunk(current_chunk, document_flow)
 
         return document_flow
@@ -131,7 +128,6 @@ class ClientResponsesProcessor(DocumentProcessor):
         max_chunk_size = 750  # Adjust the chunk size as needed
         found_subheader = False
         last_found_was_header = False
-        current_subheading = ""
         
         for paragraph in self.cleaned_paragraphs:
             if "Forum House at Brookfield Place East Podium, 2nd Floor 181 Bay Street Toronto, ON M5J 2T3" in paragraph.content:

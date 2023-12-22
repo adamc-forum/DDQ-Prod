@@ -8,7 +8,7 @@ const Result = ({ results }) => { // Destructure the results from props
                 {`Search Result #${index + 1}`}
             </div>
             <div>
-                {`Similarity Score: ${item.similarityScore}, File: ${item.filename[0]}, Page Number: ${item.page[0]}`}
+                {`Similarity Score: ${item.similarityScore}, Client: ${item.clientName[0]}, Document: ${item.documentName[0]}, Date: ${item.date[0]}, Page Number: ${item.page[0]}`}
             </div>
             <div>
                 {`${item.content[0]}`}

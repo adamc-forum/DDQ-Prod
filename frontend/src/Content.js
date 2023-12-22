@@ -28,6 +28,7 @@ const Content = () => {
 
   return (
     <>
+      <p>Forum DDQ Search AI</p>
       <form onSubmit={handleSubmit}>
         <input 
           type="text" 

@@ -41,7 +41,9 @@ def generate_completion(query: str):
         response['similarityScore'] = result['similarityScore']
         response['page'] = result['document']['page']
         response['content'] = result['document']['content']
-        response['filename'] = result['document']['filename']
+        response['clientName'] = result['document']['clientName']
+        response['date'] = result['document']['date']
+        response['documentName'] = result['document']['documentName']
         response_list.append(response)
     
     system_prompt = '''
