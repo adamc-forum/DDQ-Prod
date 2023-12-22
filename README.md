@@ -1,5 +1,29 @@
 # DDQ
 
+## Deploying web app
+
+The web app is deployed via the Fast API library. The frontend static files are hosted at the root path `/` whereas the search api is hosted at the `/search` route. THey were hosted via the same web app / root domain to avoid any CORS issues.
+
+- The backend is effectively the root directory.
+
+- If you make any changes to the frontend folder, build the folder via the `npm run build` command, copy the resulting `build` folder into the backend directory and rename it to `public`.
+
+- To deploy the webapp, navigate to the backend directory
+
+- `cd backend`
+
+- Run the follow azure cli command to upload the files in the current directory (backend) to the web app. Ensure you are using a cmd shell.
+
+- `az webapp up --name DDQ-Web-App --resource-group rg-duedilligence-shared-001 --plan DDQ-Web-App-Service-Plan --runtime "PYTHON|3.9"`
+
+## Helpful Commands
+
+To delete all documents in the database
+
+`db_client.remove_data_from_collection(delete_all=True)`
+
+Python datetime objects are not json serializable but dates must be uploaded in this format to MongoDB to enable native filtering by dates. If you need to rely on any backup json files, ensure you convert the stringified date to a datetime object first before uploading to MongoDB.
+
 ## Relevant Concepts
 
 The Retrieval Augment Generation (RAG) architecture can be described as follows
