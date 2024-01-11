@@ -55,9 +55,9 @@ embedding = client.embeddings.create(
 )
 ```
 
-- Embeddings are about understanding and representing the meaning of text in a numerical format.
-- Completion models are about generating text based on a given prompt.
-- Chat models are specialized in conversational contexts and interactions.
+- Embeddings are about understanding and representing the meaning of text in a numerical format
+- Completion models are about generating text based on a given prompt
+- Chat models are specialized in conversational contexts and interactions
 
 ## Getting Started
 
