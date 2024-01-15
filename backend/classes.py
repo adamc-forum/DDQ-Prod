@@ -60,7 +60,7 @@ class DocumentFlow:
         self.chunks: list[DocumentChunk] = []
         self.filename = filename
         self.client_name, self.document_name, self.date = self.parse_filename()
-        print(f"Classes.py - file metadata: {self.client_name, self.document_name, self.date}")
+        # print(f"Classes.py - file metadata: {self.client_name, self.document_name, self.date}")
     
     def parse_filename(self):
         # Expected filename format is Forum Internal_Master DDQ_30-06-2023
@@ -90,7 +90,7 @@ class DocumentFlow:
     def __str__(self):
         output = []
         for index, chunk in enumerate(self.chunks):
-            output.append(f"Chunk: {index}, Page Number: {chunk.page_number}, Date: {chunk.date}\n{chunk.content}\n{'_' * 30}")
+            output.append(f"Chunk: {index}, Client Name: {chunk.client_name}, Document Name: {chunk.document_name}, Page Number: {chunk.page_number}, Date: {chunk.date}\n{chunk.content}\n{'_' * 30}")
         return "\n".join(output)
     
     def to_dict(self) -> list[dict]:

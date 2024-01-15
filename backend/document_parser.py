@@ -84,7 +84,7 @@ class DocumentParser:
         for table_idx, table in enumerate(tables):
             table_header = f"Table {table_idx}"
             table_rows = self.table_cells_to_rows(table)
-            column_headers = [f"column{i+1}" for i in range(table.column_count)]
+            column_headers = [f"column {i+1}" for i in range(table.column_count)]
             current_row = []
             all_rows = []
             parsed_successfully = True
@@ -102,7 +102,7 @@ class DocumentParser:
                                 break
                         if 'content' in cell.kind.lower():
                             current_row = [
-                                f"{column_headers[index] if column_headers[index] else f'column{index+1}'} is {row_cell.content}," 
+                                f"{column_headers[index] if column_headers[index] else f'column {index+1}'} is {row_cell.content}," 
                                 for index, row_cell in enumerate(row)
                             ]
                             all_rows.append(
@@ -180,7 +180,7 @@ class DocumentParser:
         min_words = 0,
         paragraphs: list[CleanedParagraph] = None,
         regex_pattern: str = None,
-        avoid_spans: list(tuple[int, int]) = None  
+        avoid_spans: list[tuple[int, int]] = None  
     ) -> list[CleanedParagraph]:
         matching_paragraphs = []
         for paragraph in paragraphs:

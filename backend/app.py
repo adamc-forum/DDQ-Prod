@@ -27,8 +27,11 @@ def read_root(query: str = Query(None, title="Query")):
             "results": vector_search_results
         }
     except Exception as e:
-        print(e)
         return {"Message": f"Error fetching response: {e}"}
+
+@app.get("/ping")
+def ping():
+    return {"Message": "Healthy"}
 
 # Mount the `static` directory to the path `/`
 app.mount("/", StaticFiles(directory="public", html=True), name="public")

@@ -6,6 +6,7 @@ import SearchResults from './components/SearchResults/SearchResults';
 import React, { useState } from 'react';
 import SearchResponse from './components/SearchResponse/SearchResponse';
 import Spinner from './components/Spinner/Spinner';
+import Header from './components/Header/Header';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -31,12 +32,15 @@ function App() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetchData(query);
-    setQuery(''); // Clear the input field
+    if(!isLoading) {
+      fetchData(query);
+      setQuery(''); // Clear the input field
+    }
   };
 
   return (
     <div className="app">
+      <Header text={"REIIF DDQ Assistant"} />
       <SearchForm 
         query={query} 
         setQuery={setQuery} 
