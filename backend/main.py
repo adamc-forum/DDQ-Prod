@@ -1,10 +1,13 @@
 import pickle
 import json
 from datetime import datetime
+from typing import Union
 
 from document_processor_subclasses import (
-    MasterDDQProcessor, 
-    ClientResponsesProcessor
+    MasterDDQProcessor,
+    OMProcessor,
+    ClientResponsesProcessor,
+    ClientResponseProcessor
 )
 
 from constants import (
@@ -19,10 +22,26 @@ from constants import (
     DI_API_KEY
 )
 
+import re
+
+from docx import (
+    Document
+)
+
+from docx.document import Document as DocumentType
+
+from docx.table import (
+    Table
+)
+
+from docx.text.paragraph import (
+    Paragraph
+)
+
 from functions import(
-    get_openai_client, 
+    get_openai_client,
     get_db_client,
-    get_service_management_client, 
+    get_service_management_client,
     get_models
 )
 
@@ -46,7 +65,7 @@ from document_parser import (
 
 from document_parser_utils import (
     is_similar_color,
-    add_chunk_and_initialize_new
+    remove_non_alphanumeric
 )
 
 from azure.ai.formrecognizer import AnalyzeResult, DocumentParagraph
@@ -61,33 +80,29 @@ embedding_model, completions_model = get_models()
 
 # db_client.create_indices()
 
-# db_client.remove_data_from_collection(delete_all=True)
-
 # document_analysis_result = analyze_layout(TARGET_PDF_PATH, DI_ENDPOINT, DI_API_KEY)
 
-# print(document_analysis_result)
-
-with open('MasterDDQ.pkl', 'rb') as file:
+with open('layout_backup.pkl', 'rb') as file:
     result = pickle.load(file)
 
-document_parser = DocumentParser(result=result, start_page=3)
+document_parser = DocumentParser(result=result)
 
-filename = TARGET_PDF_PATH.split('/')[-1].split(".pdf")[0]
+filename = TARGET_PDF_PATH.split('/')[-1]
 
-# client_response_processor = ClientResponsesProcessor(document_parser=document_parser, subheader_color="#010101", filename=filename)
+document: DocumentType = Document(
+    TARGET_PDF_PATH.replace(".pdf", ".docx")
+)
 
-master_ddq_processor = MasterDDQProcessor(document_parser=document_parser, filename=filename)
+client_response_processor = ClientResponseProcessor(document_parser, filename, document)
 
-document_flow: DocumentFlow = master_ddq_processor.process_document()
-
-# print(document_flow)
+document_flow = client_response_processor.process_document()
 
 with open(f"{document_flow.client_name}_{document_flow.document_name}_parsing_backup.json", "w") as file:
-    file.write(json.dumps(document_flow.to_dict()))  
+    file.write(json.dumps(document_flow.to_dict()))
 
 vectorized_chunks = convert_chunks_to_json(document_flow.chunks, openai_client, embedding_model)
 
 # with open(f"{document_flow.client_name}_{document_flow.document_name}_parsing_vectorized_backup.json", "r", encoding="utf-8") as file:
-#     data = file.read() 
+#     data = file.read()
 
 db_client.add_data_to_collection(vectorized_chunks)
