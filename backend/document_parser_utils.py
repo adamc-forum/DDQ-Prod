@@ -1,7 +1,5 @@
 import math
-from classes import (
-    DocumentFlow, DocumentChunk
-)
+import re
 
 def hex_to_rgb(hex_color):
     """Converts a hex color string to an RGB tuple."""
@@ -27,12 +25,5 @@ def is_start_in_range(start, ranges):
             return True
     return False
 
-def add_chunk_and_initialize_new(current_chunk: DocumentChunk, document_flow: DocumentFlow, min_words_threshold=8):
-    try:
-        current_content = ''.join(current_chunk.content.split(':')[1:]).split(' ')
-    except:
-        print(F"WARNING: Encountered chunk {current_chunk.content} with only {len(current_content)} chunks")
-        current_content = []
-    if current_chunk.paragraphs and len(current_content) >= min_words_threshold:  # Check if the current chunk has content before adding
-        document_flow.add_chunk(current_chunk)
-    return DocumentChunk()
+def remove_non_alphanumeric(s: str):
+    return re.sub(r'[^a-zA-Z0-9]', '', s)

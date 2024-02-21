@@ -42,7 +42,7 @@ def convert_chunks_to_json(chunks: list[DocumentChunk], client, embedding_model)
     for item in items_json:
         item['date'] = item['date'][0].strftime('%Y-%m-%d %H:%M:%S')
     
-    with open("document_parsing_vectorized_backup.json", "w") as f:
+    with open(f"{chunks[0].client_name}_{chunks[0].document_name}_parsing_vectorized_backup.json", "w") as f:
         json.dump(items_json, f)
     
     return items

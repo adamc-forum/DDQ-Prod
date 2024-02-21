@@ -177,15 +177,15 @@ class DocumentParser:
     def get_matching_paragraphs(
         self, 
         span_groups: list[list[tuple[int, int]]], 
+        paragraphs: list[CleanedParagraph],
         min_words = 0,
-        paragraphs: list[CleanedParagraph] = None,
         regex_pattern: str = None,
         avoid_spans: list[tuple[int, int]] = None  
     ) -> list[CleanedParagraph]:
         matching_paragraphs = []
         for paragraph in paragraphs:
             paragraph_start = paragraph.span[0]
-            if any(span[0] <= paragraph_start < span[0] + span[1] for span in avoid_spans):
+            if avoid_spans and any(span[0] <= paragraph_start < span[0] + span[1] for span in avoid_spans):
                 continue
             if all(is_start_in_range(paragraph_start, spans) for spans in span_groups):
                 if len(paragraph.content.split(" ")) >= min_words:

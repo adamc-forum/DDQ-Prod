@@ -2,8 +2,14 @@ from azure.ai.formrecognizer import DocumentAnalysisClient, AnalysisFeature, Ana
 from azure.core.credentials import AzureKeyCredential
 from collections import defaultdict
 import pickle
+import os
 
 def analyze_layout(file_path, endpoint, api_key) -> AnalyzeResult:
+
+    if os.path.exists('layout_backup.pkl'):
+        print("Error: Unable to analyze document, 'layout_backup.pkl' file already exists.")
+        return
+
     document_analysis_client = DocumentAnalysisClient(
         endpoint=endpoint, credential=AzureKeyCredential(api_key)
     )

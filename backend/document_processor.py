@@ -10,7 +10,7 @@ from document_parser import DocumentParser
 from document_parser_utils import is_similar_color
 
 class DocumentProcessor:
-    def __init__(self, document_parser, filename, min_chunk_words=15, max_chunk_words=125):
+    def __init__(self, document_parser: DocumentParser, filename, min_chunk_words=15, max_chunk_words=125):
         self.filename = filename
         self.document_parser: DocumentParser = document_parser
         self.cleaned_paragraphs = self.document_parser.extract_cleaned_paragraphs()
@@ -87,3 +87,10 @@ class DocumentProcessor:
             if is_similar_color(color, font_color.color):
                 color_spans.extend(font_color.span)
         return color_spans
+
+    def get_subheader_spans(self):
+        matching_spans = []
+        for paragraph in self.cleaned_paragraphs:
+            if paragraph.role == "sectionHeading":
+                matching_spans.append(paragraph.span)
+        return matching_spans

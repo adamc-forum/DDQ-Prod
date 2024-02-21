@@ -71,7 +71,7 @@ class DocumentFlow:
 
         client_name = parts[0].strip()
         document_name = parts[1].strip()
-        date_str = parts[2].strip()
+        date_str = parts[2].strip().split('.')[0]
         
         try:
             date = datetime.strptime(date_str, "%d-%m-%Y")
