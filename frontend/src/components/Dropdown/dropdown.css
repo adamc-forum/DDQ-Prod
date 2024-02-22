@@ -1,0 +1,73 @@
+.dropdown {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  width: 50%;
+  color: #333333;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  width: calc(100% - 2px); /* Set width to 100% of the parent minus border */
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  top: 100%;
+  left: 0;
+}
+
+.dropdown-value {
+  font-size: 1rem; /* Adjusted font size for better readability */
+  display: flex;
+  align-items: center; /* Vertically center content */
+  justify-content: space-between; /* Space between the count and button */
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  cursor: pointer; /* Change cursor to indicate clickable */
+  text-align: center;
+}
+
+.dropdown-button {
+  background-color: transparent; /* Remove button background */
+  border: none; /* Remove button border */
+  cursor: pointer; /* Indicate the button is clickable */
+  transform: rotate(90deg); /* Rotate button to indicate dropdown */
+  transition: transform 0.3s; /* Smooth rotation animation */
+}
+
+.dropdown-button.open {
+  transform: rotate(-90deg); /* Rotate button for open state */
+}
+
+.dropdown-content.open {
+  display: block; /* Hide by default */
+}
+
+.dropdown-content-button {
+  font-size: 1rem; /* Adjusted font size for better readability */
+  text-align: center;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.selected {
+  background: rgba(0, 0, 0, 0.1);
+}
+.unselected:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transition: all;
+}
+
+.chevron {
+  width: 1rem;
+  height: 1rem;
+  transform: rotate(-90deg);
+}

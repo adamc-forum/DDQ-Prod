@@ -1,6 +1,39 @@
+.search-form {
+    width: 75vw;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .search-form__input-section {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     gap: 1rem;
-    margin: 0 10rem;
+    width: 100%;
+}
+
+.search-form__dropdown-group {
+    display: flex;
+    gap: 2rem;
+    justify-content: flex-start;
+}
+
+.search-form__dropdown-group > div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 40%;
+    gap: 1rem;
+}
+
+.search-form__client-select {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-form__client-select > div {
+    flex: 1;
 }
