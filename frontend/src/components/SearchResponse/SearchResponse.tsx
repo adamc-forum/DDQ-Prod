@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import ResultItem from "../ResultItem/ResultItem";
+import React from "react";
 import "./search-response.css";
 
-const SearchResponse = ({ response }) => {
+const SearchResponse = ({ response }: { response: string }) => {
   console.log(`Recieved response: ${response}`);
   return (
     <div>

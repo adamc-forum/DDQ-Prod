@@ -1,30 +1,36 @@
 import "./styles/global.css";
 import "./app.css";
-import API from "./Api.js";
+import API from "./Api";
 import SearchForm from "./components/SearchForm/SearchForm";
 import SearchResults from "./components/SearchResults/SearchResults";
 import React, { useState } from "react";
 import SearchResponse from "./components/SearchResponse/SearchResponse";
 import Spinner from "./components/Spinner/Spinner";
 import Header from "./components/Header/Header";
-import { testResults } from "./test.js";
-import { SORT_BY_SIMILARITY, RESULT_COUNT_LIST } from "./constants.js";
+// import { testResults } from "./test.js";
+import { SortOption, RESULT_COUNT_LIST, ResultCount } from "./constants";
+import { Result } from "./components/ResultItem/ResultItem";
+import SearchQuery from "./components/SearchQuery/SearchQuery";
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [prevQuery, setPrevQuery] = useState("");
-  const [resultCount, setResultCount] = useState(RESULT_COUNT_LIST[0]);
-  const [results, setResults] = useState([]);
-  const [llmResponse, setLlmResponse] = useState(""); // State to store the additional response
-  const [isLoading, setIsLoading] = useState(false);
-  const [sortOption, setSortOption] = useState(SORT_BY_SIMILARITY); // Default to sorting by date
-  const [clients, setClients] = useState([]);
+  const [query, setQuery] = useState<string>("");
+  const [prevQuery, setPrevQuery] = useState<string>("");
+  const [resultCount, setResultCount] = useState<ResultCount>(
+    RESULT_COUNT_LIST[0]
+  );
+  const [results, setResults] = useState<Result[]>([]);
+  const [llmResponse, setLlmResponse] = useState<string>(""); // State to store the additional response
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [sortOption, setSortOption] = useState<SortOption>(
+    SortOption.Similarity
+  ); // Default to sorting by date
+  const [clients, setClients] = useState<string[]>([]);
 
-  const handleClientChange = (selectedClients) => {
+  const handleClientChange = (selectedClients: string[]) => {
     setClients(selectedClients);
   };
 
-  const fetchData = async (userQuery) => {
+  const fetchData = async (userQuery: string) => {
     setIsLoading(true); // Start loading
     try {
       const response = await API.get(
@@ -44,7 +50,7 @@ function App() {
     setIsLoading(false); // Stop loading
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.KeyboardEvent | React.MouseEvent) => {
     if (event) event.preventDefault();
     if (!query) return;
     if (clients.length === 0) return;
@@ -73,12 +79,7 @@ function App() {
         <Spinner /> // Display spinner while loading
       ) : (
         <div className="search-content-container">
-          {!isLoading && prevQuery && (
-            <div>
-              <p className="body-header">Query: </p>
-              <p>{prevQuery}</p>
-            </div>
-          )}
+          {!isLoading && prevQuery && <SearchQuery prevQuery={prevQuery} />}
           {llmResponse && <SearchResponse response={llmResponse} />}
           {results.length > 0 && (
             <SearchResults results={results} sortOption={sortOption} />

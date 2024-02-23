@@ -3,11 +3,7 @@ import SearchField from "../SearchField/SearchField";
 import SearchButton from "../SearchButton/SearchButton";
 import "./search-form.css";
 import Dropdown from "../Dropdown/Dropdown";
-import {
-  RESULT_COUNT_LIST,
-  SORT_BY_DATE,
-  SORT_BY_SIMILARITY,
-} from "../../constants";
+import { RESULT_COUNT_LIST, SORT_OPTIONS_LIST, SortOption, ResultCount } from "../../constants";
 import ClientSelect from "../Select/ClientSelect";
 
 const SearchForm = ({
@@ -20,8 +16,18 @@ const SearchForm = ({
   sortOption,
   setSortOption,
   handleClientChange,
+}: {
+  query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
+  handleSubmit: (e: React.KeyboardEvent | React.MouseEvent) => void;
+  isLoading: boolean;
+  resultCount: ResultCount;
+  setResultCount: React.Dispatch<React.SetStateAction<ResultCount>>;
+  sortOption: SortOption;
+  setSortOption: React.Dispatch<React.SetStateAction<SortOption>>;
+  handleClientChange: (params: string[]) => void;
 }) => {
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       event.preventDefault();
       handleSubmit(event);
@@ -29,10 +35,7 @@ const SearchForm = ({
   };
 
   return (
-    <form
-      className="search-form"
-      onKeyDown={handleKeyDown}
-    >
+    <form className="search-form" onKeyDown={handleKeyDown}>
       <div className="search-form__input-section">
         <SearchField query={query} setQuery={setQuery} />
       </div>
@@ -43,7 +46,7 @@ const SearchForm = ({
       <div className="search-form__dropdown-group">
         <div>
           <span>Number of results: </span>
-          <Dropdown
+          <Dropdown<ResultCount>
             selectedValue={resultCount}
             setSelectedValue={setResultCount}
             optionsList={RESULT_COUNT_LIST}
@@ -54,11 +57,15 @@ const SearchForm = ({
           <Dropdown
             selectedValue={sortOption}
             setSelectedValue={setSortOption}
-            optionsList={[SORT_BY_DATE, SORT_BY_SIMILARITY]}
+            optionsList={SORT_OPTIONS_LIST}
           />
         </div>
       </div>
-      <SearchButton buttonText="Search" isLoading={isLoading} handleSubmit={handleSubmit}/>
+      <SearchButton
+        buttonText="Search"
+        isLoading={isLoading}
+        handleSubmit={handleSubmit}
+      />
     </form>
   );
 };

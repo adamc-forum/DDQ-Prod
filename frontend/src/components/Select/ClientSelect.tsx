@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
-import Select from "react-select";
+import Select, { MultiValue } from "react-select";
 import API from "../../Api";
 
-const ClientSelect = ({ onClientChange }) => {
-  const [clients, setClients] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [selectAllLabel, setSelectAllLabel] = useState("Deselect all");
+interface ClientOption {
+  value: string;
+  label: string;
+}
+
+const ClientSelect = ({
+  onClientChange,
+}: {
+  onClientChange: (params: string[]) => void;
+}) => {
+  const [clients, setClients] = useState<ClientOption[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<ClientOption[]>([]);
+  const [selectAllLabel, setSelectAllLabel] = useState<string>("Deselect all");
 
   useEffect(() => {
     onClientChange(selectedOptions.map((option) => option.value));
@@ -14,7 +23,7 @@ const ClientSelect = ({ onClientChange }) => {
   useEffect(() => {
     API.get("/clients")
       .then((response) => {
-        const clientOptions = response.data.clientNames.map((name) => ({
+        const clientOptions = response.data.clientNames.map((name: string) => ({
           value: name,
           label: name,
         }));
@@ -24,7 +33,7 @@ const ClientSelect = ({ onClientChange }) => {
       .catch((error) => console.error("Error fetching clients:", error));
   }, []);
 
-  const handleChange = (selected) => {
+  const handleChange = (selected: MultiValue<ClientOption>) => {
     if (selected.some((option) => option.value === "all")) {
       if (selectedOptions.length === clients.length) {
         setSelectedOptions([]);
@@ -34,7 +43,7 @@ const ClientSelect = ({ onClientChange }) => {
         setSelectAllLabel("Deselect all");
       }
     } else {
-      setSelectedOptions(selected);
+      setSelectedOptions([...selected]);
       if (selected.length === clients.length) {
         setSelectAllLabel("Deselect all");
       } else {

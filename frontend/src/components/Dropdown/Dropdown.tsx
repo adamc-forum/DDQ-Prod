@@ -3,18 +3,26 @@ import "./dropdown.css";
 import { Chevron } from "../Icons/Chevron";
 
 // Renamed props for generality
-const Dropdown = ({ selectedValue, setSelectedValue, optionsList }) => {
+function Dropdown<T>({
+  selectedValue,
+  setSelectedValue,
+  optionsList,
+}: {
+  selectedValue: T;
+  setSelectedValue: React.Dispatch<React.SetStateAction<T>>;
+  optionsList: readonly T[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDropdown = (event) => {
+  const toggleDropdown = (event: React.MouseEvent | React.KeyboardEvent) => {
     event.preventDefault();
     setIsOpen(!isOpen);
-  }
+  };
 
   return (
     <div className="dropdown">
       <button className="dropdown-value" onClick={toggleDropdown}>
-        <p>{selectedValue}</p>
+        <p>{String(selectedValue)}</p>
         <span className={`dropdown-button ${isOpen && "open"}`}>
           <Chevron />
         </span>
@@ -35,7 +43,7 @@ const Dropdown = ({ selectedValue, setSelectedValue, optionsList }) => {
                   setIsOpen(false);
                 }}
               >
-                <span className="dropdown-content-button-text">{option}</span>
+                <span className="dropdown-content-button-text">{String(option)}</span>
               </button>
             </p>
           ))}
