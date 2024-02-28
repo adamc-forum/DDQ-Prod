@@ -1,0 +1,23 @@
+.table__btngroup {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.table__btngroup-add,
+.table__btngroup-delete {
+  border: none;
+  font-size: 1rem;
+  background-color: var(--mahogany);
+  color: var(--pearl);
+  padding: 0.3rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.table__btngroup-delete:disabled {
+  background-color: var(--grey); /* Lighter grey background */
+  color: var(--charcoal); /* Darker grey text */
+  cursor: not-allowed;
+}

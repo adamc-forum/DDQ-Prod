@@ -1,0 +1,19 @@
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-links > a {
+  text-decoration: none;
+  color: var(--charcoal); /* Charcoal text for inactive links */
+  border-radius: 25px;
+  transition: background-color 0.3s ease;
+  padding: 0.25rem 1rem;
+}
+
+.nav-links > a:hover,
+.nav-links > .active {
+  color: var(--pearl);
+  background-color: var(--mahogany);
+  font-weight: 600;
+}

@@ -1,0 +1,22 @@
+.root-page {
+  margin: 1rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.header {
+  /* Centered by Flexbox */
+}
+
+.navbar > nav {
+  position: absolute;
+  right: 0;
+}

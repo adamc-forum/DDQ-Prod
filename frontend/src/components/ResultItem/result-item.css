@@ -4,6 +4,13 @@
     margin-bottom: 10px;
     border-radius: 5px; /* Slightly rounded corners */
     background-color: #f9f9f9; /* Light background */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for background color change */
+}
+
+.search-result__result-item:hover {
+    background-color: rgba(243, 243, 243); /* Slightly darker shade on hover */
+    cursor: pointer; /* Changes the cursor to a pointer to indicate clickable area */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow on hover */
 }
 
 .search-result__result-item div {
