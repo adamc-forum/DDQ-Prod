@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select, { MultiValue } from "react-select";
 import API from "../../Api";
+import { useDocumentContext } from "../../context/DocumentContext";
 
 interface ClientOption {
   value: string;
@@ -15,23 +16,21 @@ const ClientSelect = ({
   const [clients, setClients] = useState<ClientOption[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<ClientOption[]>([]);
   const [selectAllLabel, setSelectAllLabel] = useState<string>("Deselect all");
+  const { documents, refetchDocuments } = useDocumentContext();
 
   useEffect(() => {
     onClientChange(selectedOptions.map((option) => option.value));
   }, [selectedOptions]);
 
   useEffect(() => {
-    API.get("/clients")
-      .then((response) => {
-        const clientOptions = response.data.clientNames.map((name: string) => ({
-          value: name,
-          label: name,
-        }));
-        setClients(clientOptions);
-        setSelectedOptions(clientOptions); // Set all clients as selected by default
-      })
-      .catch((error) => console.error("Error fetching clients:", error));
-  }, []);
+    const clientNamesSet = new Set(documents.map((doc) => doc.clientName));
+    const clientOptions = Array.from(clientNamesSet).map((name) => ({
+      value: name,
+      label: name,
+    }));
+    setClients(clientOptions);
+    setSelectedOptions(clientOptions);
+  }, [documents]);
 
   const handleChange = (selected: MultiValue<ClientOption>) => {
     if (selected.some((option) => option.value === "all")) {

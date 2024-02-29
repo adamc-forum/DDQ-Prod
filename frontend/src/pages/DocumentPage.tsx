@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import Spinner from "../components/Spinner/Spinner";
 import DocumentTable from "../components/Table/DocumentTable";
 import TableBtnGroup from "../components/Table/TableBtnGroup";
+import { useDocumentContext } from "../context/DocumentContext";
 
 export interface ClientDocument {
   id: string;
@@ -14,11 +15,12 @@ export interface ClientDocument {
 }
 
 function DocumentPage() {
-  const [documents, setDocuments] = useState<ClientDocument[]>([]); // State to store fetched data
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
     null
   );
+  const { documents, refetchDocuments } = useDocumentContext();
+  const [idDocuments, setIdDocuments] = useState<ClientDocument[]>([]);
 
   const handleSelectionChange = (documentId: string | null) => {
     setSelectedDocumentId(documentId);
@@ -26,22 +28,14 @@ function DocumentPage() {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    API.get("/documents")
-      .then((response) => {
-        const clientDocuments: ClientDocument[] =
-          response.data.clientDocuments.map((doc: ClientDocument) => ({
-            ...doc,
-            id: `${doc.clientName}_${doc.documentName}_${doc.date}`, // Concatenate to form the id
-          }));
-        setDocuments(clientDocuments);
+    const clientDocuments: ClientDocument[] = documents.map(
+      (doc: ClientDocument) => ({
+        ...doc,
+        id: `${doc.clientName}_${doc.documentName}_${doc.date}`, // Concatenate to form the id
       })
-      .catch((error) => console.error("Error fetching documents:", error))
-      .finally(() => {
-        console.log(documents);
-        setIsLoading(false);
-      });
-  }, []);
+    );
+    setIdDocuments(clientDocuments);
+  }, [documents]);
 
   return (
     <>
@@ -51,11 +45,13 @@ function DocumentPage() {
         <div className="document-page">
           <TableBtnGroup
             onAdd={() => console.log("Add Document")}
-            onDelete={() => console.log(`Delete Document ${selectedDocumentId}`)}
+            onDelete={() =>
+              console.log(`Delete Document ${selectedDocumentId}`)
+            }
             selectedDocumentId={selectedDocumentId}
           />
           <DocumentTable
-            data={documents}
+            data={idDocuments}
             selectedDocumentId={selectedDocumentId}
             onSelectionChange={handleSelectionChange}
           />

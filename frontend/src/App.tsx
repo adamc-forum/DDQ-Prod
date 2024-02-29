@@ -1,12 +1,13 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { DocumentProvider } from "./context/DocumentContext"; // Import DocumentProvider
 
 import SearchPage from "./pages/SearchPage";
 import RootPage from "./pages/RootPage";
-
-import "./app.css"
 import DocumentPage from "./pages/DocumentPage";
+
+import "./app.css";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <div>
-      <RouterProvider router={router} />
+      <DocumentProvider>
+        <RouterProvider router={router} />
+      </DocumentProvider>
     </div>
   );
 }
