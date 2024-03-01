@@ -13,7 +13,7 @@ from api_methods import (
     get_distinct_client_names,
     get_distinct_client_document_date_combinations,
     get_parsed_pdf,
-    get_vectorized_chunks, 
+    get_vectorized_chunks,
     add_documents_to_db
 )
 
@@ -30,13 +30,13 @@ app = FastAPI()
 # Configure CORS for dev environment
 # Not required for prod since both frontend and api have same root domain, same-origin request
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],  # Allows all origins
-#     allow_credentials=True,
-#     allow_methods=["*"],  # Allows all methods
-#     allow_headers=["*"],  # Allows all headers
-# )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 
 @app.get("/search")
@@ -87,5 +87,84 @@ def get_client_documents(
     except Exception as e:
         return {"Message": f"Error fetching document url: {e}"}
 
+
 # Mount the `static` directory to the path `/`
 app.mount("/", StaticFiles(directory="public", html=True), name="public")
+
+
+@app.post("/upload")
+def upload_document(
+
+    client_name: str = Form(...),
+
+    document_name: str = Form(...),
+
+    date: str = Form(...),
+
+    docx_document: UploadFile = File(...),
+
+    pdf_document: UploadFile = File(...)
+
+):
+
+    if not docx_document.filename.endswith(".docx"):
+
+        raise HTTPException(
+            status_code=400, detail="Invalid file type, expecting .docx")
+
+    if not pdf_document.filename.endswith(".pdf"):
+
+        raise HTTPException(
+            status_code=400, detail="Invalid file type, expecting .pdf")
+
+    try:
+
+        word_file_content = docx_document.read()
+
+        pdf_file_content = pdf_document.read()
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500, detail=f"Error reading document: {e}")
+
+    try:
+
+        word_file_stream = BytesIO(word_file_content)
+
+        document: DocumentType = Document(word_file_stream)
+
+        document_parser = get_parsed_pdf(
+            pdf_file_content, DI_ENDPOINT, DI_API_KEY)
+
+        formatted_date = datetime.strptime(
+            date, "%Y-%m-%d").strftime("%d-%m-%Y")
+
+        filename = f"{client_name}_{document_name}_{formatted_date}.pdf"
+
+        vectorized_chunks = get_vectorized_chunks(
+            document_parser, filename, document)
+
+        add_documents_to_db(vectorized_chunks)
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500, detail=f"Error processing and chunking document: {e}")
+
+    try:
+
+        successful_upload = upload_document_to_sharepoint(
+            word_file_content, client_name, document_name, date)
+
+        if not successful_upload:
+
+            raise HTTPException(
+                status_code=500, detail="Failed to upload file to SharePoint")
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500, detail=f"Error uploading document to SharePoint: {e}")
+
+    return JSONResponse(content={"message": "File uploaded successfully"}, status_code=200)
