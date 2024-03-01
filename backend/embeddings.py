@@ -17,7 +17,7 @@ def generate_embeddings(text, client, model="text-embedding-ada-002"): # model =
     time.sleep(0.5) # rest period to avoid rate limiting on AOAI for free tier
     return client.embeddings.create(input = [text], model=model).data[0].embedding
 
-def convert_chunks_to_json(chunks: list[DocumentChunk], client, embedding_model):
+async def convert_chunks_to_json(chunks: list[DocumentChunk], client, embedding_model):
     items = []
     n = 0
     title_embeddings = None

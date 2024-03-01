@@ -87,3 +87,16 @@ def get_sharepoint_drive_id(site_id: str) -> str:
             drive_id = drive.get('id')
             return drive_id
     return ""
+
+def upload_document_to_sharepoint(file_content: bytes, client_name: str, document_name: str, date: str):
+    try:
+        headers = get_sharepoint_headers()
+        graph_api_endpoint = "https://graph.microsoft.com/v1.0/sites/forumequitypartners.sharepoint.com:/sites/REIIFDDQAssistant"
+        site_id = get_sharepoint_site_id(graph_api_endpoint)
+        drive_id = get_sharepoint_drive_id(site_id)
+        file_path = f"Test/{client_name}_{document_name}_{date}.docx"
+        upload_api_endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{file_path}:/content"
+        response = requests.put(upload_api_endpoint, headers=headers, data=file_content)
+    except Exception as e:
+        print(f"Uploading error: {e}")
+    return response.status_code in (200, 201)

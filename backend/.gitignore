@@ -3,3 +3,5 @@ env
 *.json
 *.pkl
 /__pycache__
+/public
+.DS_Store

@@ -5,7 +5,7 @@ dotenv.load_dotenv()
 
 # ------------------------- General Constants --------------------
 
-TARGET_PDF_PATH = "../data/raw/Forum Internal_Master DDQ_30-06-2023.pdf"
+TARGET_PDF_PATH = "../data/raw/BakerFinancialGroup_Responses_28-02-2023.pdf"
 
 # ------------------------- DB Constants --------------------
 
@@ -28,3 +28,7 @@ ACCOUNT_NAME = os.environ.get("ACCOUNT_NAME")
 
 DI_ENDPOINT = os.environ.get("DI_API_ENDPOINT")
 DI_API_KEY = os.environ.get("DI_API_KEY")
+
+# ------------------------- Sharepoint Constants --------------------
+
+SHAREPOINT_BASE_URL = "https://forumequitypartners.sharepoint.com/sites/REIIFDDQAssistant/Shared Documents/General"
