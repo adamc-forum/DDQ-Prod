@@ -6,6 +6,7 @@ import { DocumentProvider } from "./context/DocumentContext"; // Import Document
 import SearchPage from "./pages/SearchPage";
 import RootPage from "./pages/RootPage";
 import DocumentPage from "./pages/DocumentPage";
+import UploadPage from "./pages/UploadPage";
 
 import "./app.css";
 
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <SearchPage /> },
       { path: "documents", element: <DocumentPage /> },
+      { path: "upload", element: <UploadPage /> },
     ],
   },
 ]);

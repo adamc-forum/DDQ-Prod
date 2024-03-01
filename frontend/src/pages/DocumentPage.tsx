@@ -6,6 +6,7 @@ import Spinner from "../components/Spinner/Spinner";
 import DocumentTable from "../components/Table/DocumentTable";
 import TableBtnGroup from "../components/Table/TableBtnGroup";
 import { useDocumentContext } from "../context/DocumentContext";
+import { useNavigate } from "react-router-dom";
 
 export interface ClientDocument {
   id: string;
@@ -21,6 +22,7 @@ function DocumentPage() {
   );
   const { documents, refetchDocuments } = useDocumentContext();
   const [idDocuments, setIdDocuments] = useState<ClientDocument[]>([]);
+  const navigate = useNavigate(); // Create a navigation function
 
   const handleSelectionChange = (documentId: string | null) => {
     setSelectedDocumentId(documentId);
@@ -44,7 +46,7 @@ function DocumentPage() {
       ) : (
         <div className="document-page">
           <TableBtnGroup
-            onAdd={() => console.log("Add Document")}
+            onAdd={() => navigate("/upload")}
             onDelete={() =>
               console.log(`Delete Document ${selectedDocumentId}`)
             }

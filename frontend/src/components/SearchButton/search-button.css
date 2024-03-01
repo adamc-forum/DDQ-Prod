@@ -4,8 +4,8 @@
     color: var(--pearl); /* Pearl text color */
     border: none; /* No border */
     border-radius: 10px; /* Rounded corners to match the input field */
-    padding: 10px 20px; /* Vertical and horizontal padding */
-    font-size: 16px; /* Font size */
+    padding: 0.75rem 1.25rem; /* Vertical and horizontal padding */
+    font-size: 1rem; /* Font size */
     cursor: pointer; /* Pointer cursor on hover */
     transition: background-color 0.3s ease; /* Smooth transition for hover effect */
     outline: none; /* Removes the default focus outline */

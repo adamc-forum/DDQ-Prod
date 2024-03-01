@@ -16,6 +16,12 @@ const NavLinks = () => {
       >
         Documents
       </NavLink>
+      <NavLink
+        to="/upload"
+        className={({ isActive }) => (isActive ? "active" : "inactive")}
+      >
+        Upload
+      </NavLink>
     </nav>
   );
 };
