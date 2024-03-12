@@ -1,5 +1,5 @@
 from typing import Union
-from fastapi import FastAPI, Query, UploadFile, Form, HTTPException, File
+from fastapi import FastAPI, Query, UploadFile, Form, HTTPException, File, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -65,16 +65,17 @@ def get_client_names():
         return {"Message": f"Error fetching distinct client names: {e}"}
 
 
-@app.get("/documents")
+@app.get("/document-list")
 def get_client_documents():
     try:
-        distinct_client_documents = get_distinct_client_document_date_combinations()
+        distinct_client_documents = get_distinct_client_document_date_combinations(
+        )
         return {"clientDocuments": distinct_client_documents}
     except Exception as e:
         return {"Message": f"Error fetching distinct client documents: {e}"}
 
 
-@app.get("/documentUrl")
+@app.get("/document-url")
 def get_client_documents(
     client_name: str = Query(None, title="Client Name"),
     document_name: str = Query(None, title="Document Name"),
@@ -88,83 +89,72 @@ def get_client_documents(
         return {"Message": f"Error fetching document url: {e}"}
 
 
-# Mount the `static` directory to the path `/`
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
-
-
-@app.post("/upload")
-def upload_document(
-
+@app.post("/document-upload")
+async def upload_document(
     client_name: str = Form(...),
-
     document_name: str = Form(...),
-
     date: str = Form(...),
-
     docx_document: UploadFile = File(...),
-
     pdf_document: UploadFile = File(...)
-
 ):
-
     if not docx_document.filename.endswith(".docx"):
-
         raise HTTPException(
             status_code=400, detail="Invalid file type, expecting .docx")
-
     if not pdf_document.filename.endswith(".pdf"):
-
         raise HTTPException(
             status_code=400, detail="Invalid file type, expecting .pdf")
 
     try:
-
-        word_file_content = docx_document.read()
-
-        pdf_file_content = pdf_document.read()
+        word_file_content = await docx_document.read()
+        pdf_file_content = await pdf_document.read()
 
     except Exception as e:
-
         raise HTTPException(
             status_code=500, detail=f"Error reading document: {e}")
 
     try:
-
         word_file_stream = BytesIO(word_file_content)
-
         document: DocumentType = Document(word_file_stream)
-
         document_parser = get_parsed_pdf(
             pdf_file_content, DI_ENDPOINT, DI_API_KEY)
-
         formatted_date = datetime.strptime(
             date, "%Y-%m-%d").strftime("%d-%m-%Y")
-
         filename = f"{client_name}_{document_name}_{formatted_date}.pdf"
-
-        vectorized_chunks = get_vectorized_chunks(
-            document_parser, filename, document)
-
+        vectorized_chunks = await get_vectorized_chunks(document_parser, filename, document)
         add_documents_to_db(vectorized_chunks)
 
     except Exception as e:
-
         raise HTTPException(
             status_code=500, detail=f"Error processing and chunking document: {e}")
 
     try:
-
         successful_upload = upload_document_to_sharepoint(
-            word_file_content, client_name, document_name, date)
-
+            pdf_file_content, client_name, document_name, date
+        )
         if not successful_upload:
-
             raise HTTPException(
                 status_code=500, detail="Failed to upload file to SharePoint")
 
     except Exception as e:
-
         raise HTTPException(
             status_code=500, detail=f"Error uploading document to SharePoint: {e}")
 
     return JSONResponse(content={"message": "File uploaded successfully"}, status_code=200)
+
+
+@app.get("/ping")
+def ping():
+    return {"Message": "Healthy"}
+
+
+# Mount the `static` directory to the path `/`
+app.mount("/", StaticFiles(directory="public", html=True), name="public")
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def catch_all(full_path: str, request: Request):
+    return JSONResponse(content={
+        "Message":
+        f"This endpoint does not exist: {full_path} - {request}"
+    },
+        status_code=200)
