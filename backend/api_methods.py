@@ -194,23 +194,23 @@ def generate_completion(query: str, result_count: int, client_names: list = None
     return (completion_response.choices[0].message.content, response_list[:result_count])
 
 
-def get_parsed_pdf(file_content: bytes, endpoint: str, api_key: str) -> DocumentParser:
+async def get_parsed_pdf(file_content: bytes, endpoint: str, api_key: str) -> DocumentParser:
     document_analysis_client = DocumentAnalysisClient(
         endpoint=endpoint, credential=AzureKeyCredential(api_key)
     )
-    poller = document_analysis_client.begin_analyze_document(
+    poller = await document_analysis_client.begin_analyze_document(
         "prebuilt-layout", file_content, features=[AnalysisFeature.STYLE_FONT])
     result: AnalyzeResult = poller.result()
 
     return DocumentParser(result=result)
 
 
-def get_vectorized_chunks(document_parser: DocumentParser, filename: str, document):
+async def get_vectorized_chunks(document_parser: DocumentParser, filename: str, document):
     openai_client = get_openai_client()
     embedding_model, completions_model = get_models()
     client_response_processor = ClientResponseProcessor(document_parser, filename, document)
     document_flow = client_response_processor.process_document()
-    vectorized_chunks = convert_chunks_to_json(
+    vectorized_chunks = await convert_chunks_to_json(
         document_flow.chunks, openai_client, embedding_model
     )
     return vectorized_chunks

@@ -30,14 +30,13 @@ app = FastAPI()
 # Configure CORS for dev environment
 # Not required for prod since both frontend and api have same root domain, same-origin request
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
-
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],  # Allows all origins
+#     allow_credentials=True,
+#     allow_methods=["*"],  # Allows all methods
+#     allow_headers=["*"],  # Allows all headers
+# )
 
 @app.get("/search")
 def read_root(
@@ -115,13 +114,13 @@ async def upload_document(
     try:
         word_file_stream = BytesIO(word_file_content)
         document: DocumentType = Document(word_file_stream)
-        document_parser = get_parsed_pdf(
-            pdf_file_content, DI_ENDPOINT, DI_API_KEY)
+        # document_parser = get_parsed_pdf(
+        #     pdf_file_content, DI_ENDPOINT, DI_API_KEY)
         formatted_date = datetime.strptime(
             date, "%Y-%m-%d").strftime("%d-%m-%Y")
         filename = f"{client_name}_{document_name}_{formatted_date}.pdf"
-        vectorized_chunks = await get_vectorized_chunks(document_parser, filename, document)
-        add_documents_to_db(vectorized_chunks)
+        # vectorized_chunks = await get_vectorized_chunks(document_parser, filename, document)
+        # add_documents_to_db(vectorized_chunks)
 
     except Exception as e:
         raise HTTPException(
@@ -129,7 +128,7 @@ async def upload_document(
 
     try:
         successful_upload = upload_document_to_sharepoint(
-            pdf_file_content, client_name, document_name, date
+            pdf_file_content, client_name, document_name, date, in_prod=True
         )
         if not successful_upload:
             raise HTTPException(

@@ -1,4 +1,4 @@
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.mgmt.cognitiveservices import CognitiveServicesManagementClient
 from openai import AzureOpenAI
 import requests
@@ -61,24 +61,16 @@ def get_models() -> tuple[str, str]:
 
     return (embedding_model, completion_model)
 
-
-def get_access_token() -> str:
-    credential = DefaultAzureCredential()
-    token = credential.get_token("https://graph.microsoft.com/.default")
-    return token.token
-
-def get_sharepoint_headers() -> dict:
-    access_token = get_access_token()
+def get_sharepoint_headers(access_token) -> dict:
     return {"Authorization": f"Bearer {access_token}"}
 
-def get_sharepoint_site_id(graph_api_endpoint: str):
-    headers = get_sharepoint_headers()
+def get_sharepoint_site_id(graph_api_endpoint: str, access_token: str):
+    headers = get_sharepoint_headers(access_token)
     response = requests.get(graph_api_endpoint, headers=headers)
     return response.json().get('id')
 
-
-def get_sharepoint_drive_id(site_id: str) -> str:
-    headers = get_sharepoint_headers()
+def get_sharepoint_drive_id(site_id: str, access_token: str) -> str:
+    headers = get_sharepoint_headers(access_token)
     drives_api_endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives"
     response = requests.get(drives_api_endpoint, headers=headers)
     drives = response.json().get('value')
@@ -90,13 +82,14 @@ def get_sharepoint_drive_id(site_id: str) -> str:
 
 def upload_document_to_sharepoint(file_content: bytes, client_name: str, document_name: str, date: str):
     try:
-        headers = get_sharepoint_headers()
+        access_token = get_access_token()
+        headers = get_sharepoint_headers(access_token)
         graph_api_endpoint = "https://graph.microsoft.com/v1.0/sites/forumequitypartners.sharepoint.com:/sites/REIIFDDQAssistant"
-        site_id = get_sharepoint_site_id(graph_api_endpoint)
-        drive_id = get_sharepoint_drive_id(site_id)
-        file_path = f"Test/{client_name}_{document_name}_{date}.docx"
+        site_id = get_sharepoint_site_id(graph_api_endpoint, access_token)
+        drive_id = get_sharepoint_drive_id(site_id, access_token)
+        file_path = f"General/{client_name}_{document_name}_{date}.docx"
         upload_api_endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{file_path}:/content"
         response = requests.put(upload_api_endpoint, headers=headers, data=file_content)
     except Exception as e:
-        print(f"Uploading error: {e}")
+       raise e
     return response.status_code in (200, 201)
