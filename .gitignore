@@ -1,0 +1,7 @@
+backend/public/
+deployment/public/
+/data
+*.pyc
+*.azure
+*.txt
+.DS_Store
