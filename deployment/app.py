@@ -6,8 +6,10 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from docx import Document
 from docx.document import Document as DocumentType
+from docx2pdf import convert
 
 from io import BytesIO
+import os
 
 from api_methods import (
     generate_completion,
@@ -21,7 +23,8 @@ from api_methods import (
 from functions import (
     upload_document_to_sharepoint,
     delete_document_from_sharepoint,
-    get_db_client
+    get_db_client,
+    get_document_url
 )
 
 from datetime import datetime
@@ -33,13 +36,20 @@ app = FastAPI()
 # Configure CORS for dev environment
 # Not required for prod since both frontend and api have same root domain, same-origin request
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],  # Allows all origins
+#     allow_credentials=True,
+#     allow_methods=["*"],  # Allows all methods
+#     allow_headers=["*"],  # Allows all headers
+# )
+
+# UPLOAD_FOLDER = f'{os.getcwd()}/uploads'
+# OUTPUT_FOLDER = f'{os.getcwd()}/outputs'
+UPLOAD_FOLDER = '/home/site/wwwroot/uploads'
+OUTPUT_FOLDER = '/home/site/wwwroot/outputs'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 @app.get("/search")
 def read_root(
@@ -48,8 +58,7 @@ def read_root(
     client_names: list[str] = Query(None, title="Client Names")
 ):
     try:
-        llm_response, vector_search_results = generate_completion(
-            query, result_count, client_names)
+        llm_response, vector_search_results = generate_completion(query, result_count, client_names)
         return {
             "response": llm_response,
             "results": vector_search_results
@@ -70,25 +79,10 @@ def get_client_names():
 @app.get("/document-list")
 def get_client_documents():
     try:
-        distinct_client_documents = get_distinct_client_document_date_combinations(
-        )
+        distinct_client_documents = get_distinct_client_document_date_combinations()
         return {"clientDocuments": distinct_client_documents}
     except Exception as e:
         return {"Message": f"Error fetching distinct client documents: {e}"}
-
-
-@app.get("/document-url")
-def get_client_documents(
-    client_name: str = Query(None, title="Client Name"),
-    document_name: str = Query(None, title="Document Name"),
-    date: str = Query(None, title="Date"),
-    page_number: int = Query(0, title="Page Number")
-):
-    try:
-        document_url = f"{SHAREPOINT_BASE_URL}/{client_name}_{document_name}_{date}.pdf#page={page_number}"
-        return {"documentUrl": document_url}
-    except Exception as e:
-        return {"Message": f"Error fetching document url: {e}"}
 
 @app.post("/document-create")
 async def upload_document(
@@ -104,6 +98,7 @@ async def upload_document(
         raise HTTPException(status_code=400, detail="Invalid file type, expecting .pdf")
 
     try:
+        # Read the DOCX file content
         word_file_content = await docx_document.read()
         pdf_file_content = await pdf_document.read()
 
@@ -123,9 +118,10 @@ async def upload_document(
         raise HTTPException(status_code=500, detail=f"Error processing and chunking document: {e}")
 
     try:
+        # Upload the converted PDF to SharePoint
         successful_upload = upload_document_to_sharepoint(pdf_file_content, client_name, document_name, formatted_date)
         if not successful_upload:
-            raise HTTPException(status_code=500, detail=f"Failed to upload document to SharePoint")
+            raise HTTPException(status_code=500, detail="Failed to upload document to SharePoint")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading document to SharePoint: {e}")
 
