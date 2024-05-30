@@ -4,12 +4,14 @@ from embeddings import (
 )
 
 import numpy as np
+from datetime import datetime
 
 from functions import (
     get_openai_client,
     get_service_management_client,
     get_models,
-    get_db_client
+    get_db_client, 
+    get_document_url
 )
 
 from document_parser import (
@@ -25,11 +27,7 @@ from embeddings import convert_chunks_to_json
 from azure.ai.formrecognizer import DocumentAnalysisClient, AnalysisFeature, AnalyzeResult, DocumentParagraph
 from azure.core.credentials import AzureKeyCredential
 
-# Load environment variables
 load_dotenv()
-
-# Simple function to assist with vector search
-
 
 def cosine_similarity(vec1, vec2):
     dot_product = np.dot(vec1, vec2)
@@ -76,6 +74,12 @@ def vector_search(query: str, result_count: int):
         response['date'] = result['document']['date']
         response['documentName'] = result['document']['documentName']
         response['id'] = result['document']['id']
+        response['url'] = get_document_url(
+            client_name=result['document']['clientName'][0],
+            document_name=result['document']['documentName'][0],
+            date=result['document']['date'][0],
+            page_number=result['document']['page'][0]
+        )
         response_list.append(response)
 
     return response_list
@@ -116,6 +120,12 @@ def vector_search_by_client(query: str, result_count: int, client_names: list = 
         response['date'] = result['date']
         response['documentName'] = result['documentName']
         response['id'] = result['id']
+        response['url'] = get_document_url(
+            client_name=result['clientName'][0],
+            document_name=result['documentName'][0],
+            date=result['date'][0],
+            page_number=result['page'][0]
+        )
         response_list.append(response)
 
     return response_list
@@ -155,8 +165,14 @@ def get_distinct_client_document_date_combinations():
         }
     ]
     results = collection.aggregate(pipeline)
-    distinct_combinations = [{'clientName': result['clientName'][0],
-                              'documentName': result['documentName'][0], 'date': result['date'][0]} for result in results]
+    distinct_combinations = [
+        {
+            'clientName': result['clientName'][0],
+            'documentName': result['documentName'][0], 
+            'date': result['date'][0],
+            'url': get_document_url(result['clientName'][0], result['documentName'][0], result['date'][0])
+        } 
+        for result in results]
     return distinct_combinations
 
 
@@ -199,8 +215,7 @@ def get_parsed_pdf(file_content: bytes, endpoint: str, api_key: str) -> Document
     document_analysis_client = DocumentAnalysisClient(
         endpoint=endpoint, credential=AzureKeyCredential(api_key)
     )
-    poller = document_analysis_client.begin_analyze_document(
-        "prebuilt-layout", file_content, features=[AnalysisFeature.STYLE_FONT])
+    poller = document_analysis_client.begin_analyze_document("prebuilt-layout", file_content, features=[AnalysisFeature.STYLE_FONT])
     result: AnalyzeResult = poller.result()
 
     return DocumentParser(result=result)
