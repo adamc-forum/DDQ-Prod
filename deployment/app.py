@@ -47,10 +47,11 @@ app = FastAPI()
 def read_root(
     query: str = Query(None, title="Query"),
     result_count: int = Query(5, title="Result Count"),
+    word_limit: int = Query(300, title="Word Limit"),
     client_names: list[str] = Query(None, title="Client Names")
 ):
     try:
-        llm_response, vector_search_results = generate_completion(query, result_count, client_names)
+        llm_response, vector_search_results = generate_completion(query, result_count, client_names, word_limit)
         return {
             "response": llm_response,
             "results": vector_search_results

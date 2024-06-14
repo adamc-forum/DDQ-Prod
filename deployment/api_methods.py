@@ -176,29 +176,30 @@ def get_distinct_client_document_date_combinations():
     return distinct_combinations
 
 
-def generate_completion(query: str, result_count: int, client_names: list = None):
+def generate_completion(query: str, result_count: int, client_names: list = None, word_limit: int = 300):
     client_names = client_names[0].split(',')
     if (len(client_names) == len(get_distinct_client_names())):
         response_list = vector_search(query, result_count)
     else:
         response_list = vector_search_by_client(query, result_count, client_names)
 
-    system_prompt = '''
-    Your are a financial advisor for a real estate invesment fund called REIIF.
-    Your purpose is to confidently answer due dilligence inquiries about REIIF.
+    system_prompt = f'''
+    Your are a financial advisor for a real estate investment fund called REIIF.
+    Your purpose is to confidently answer due diligence queries about REIIF.
     You must create a comprehensive, relevant answer to the user's query using only the information provided.
-    The information to be provided are sections of internal finance documents about REIIF.
-    You must utilize relevant details from the provided information to create your answer.
-    Your tone and length must be consistent with that of the information about to be provided.
+    The information provided are excerpts from documents about REIIF.
+    You must only utilize relevant details from the provided information to create your answer.
+    Your tone and length must be consistent with that of the information provided.
+    The word limit is {word_limit}.
     '''
 
     messages = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": query},
+        {"role": "user", "content": f"Due Diligence Query: {query}"},
     ]
 
-    for item in response_list:
-        messages.append({"role": "system", "content": item['content'][0]})
+    for index, item in enumerate(response_list):
+        messages.append({"role": "system", "content": f"REIIF Documents Excerpt {index}: {item['content'][0]}"})
 
     embeddings_model, completions_model = get_models()
 
